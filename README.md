@@ -1,6 +1,6 @@
-# 🚦 AI-Based Smart Traffic Control & Monitoring System
+# 🚦 AI-Based Smart Traffic Management & Emergency Vehicle Priority System
 
-> An intelligent, computer-vision-driven traffic signal management system designed to eliminate static delays, prioritize emergency response, and dynamically manage urban intersection queues.
+> An intelligent, dual-node IoT and computer-vision traffic control system designed to optimize urban intersection timing through historical pattern analysis and instantaneous emergency vehicle preemption.
 
 ---
 
@@ -17,32 +17,44 @@
 ---
 
 ## 🎯 Overview
-Traditional traffic control relies heavily on rigid **fixed-time cycles** or **inductive-loop sensors**, which degrade road infrastructure and fail during peak dynamic congestion. 
+Traditional traffic control relies on rigid, pre-programmed fixed-time cycles that fail to adapt to fluctuating urban traffic densities, resulting in unnecessary delays and gridlock. 
 
-This project implements an **edge-deployed Computer Vision and AI pipeline** that captures live multi-lane visual data, calculates real-time vehicle density and queue lengths, and dynamically adjusts signal timing to minimize idle wait times and clear intersection gridlock.
+Designed with a specific focus on urban bottlenecks in Lebanon (such as the Greater Beirut area), this project implements a smart intersection model for two roads (**Road A** and **Road B**). The system separates normal traffic management—which analyzes historical weekly patterns to optimize recurring signal timings—from real-time emergency response, ensuring ambulances receive immediate priority without disrupting overall network safety.
 
 ---
 
 ## ✨ Key Features
 
-- 📹 **Real-Time Vehicle Detection:** Utilizes lightweight YOLO object detection to track vehicles frame-by-frame.
-- ⚡ **Dynamic Green-Light Allocation:** Replaces fixed timers with adaptive signal cycles based on live lane density.
-- 🚨 **Emergency Vehicle Preemption (EVP):** Instantly detects approaching ambulances/fire engines to grant immediate green-wave priority.
-- 🚗 **Multi-Class Vehicle Identification:** Differentiates between passenger cars, heavy trucks, buses, and two-wheelers.
-- 📊 **Traffic Analytics Dashboard:** Logs vehicle counts, flow rates, and queue metrics for offline traffic planning.
+- 👁️ **Computer Vision Monitoring:** A dedicated camera node captures traffic flow across both intersection approaches.
+- 📈 **Historical Pattern Analysis:** Stores and evaluates vehicle counts week-over-week to inform routine, data-driven green-light durations.
+- 🚑 **Real-Time Emergency Preemption:** Instantly detects ambulances in real time, overriding historical routines to grant immediate green-wave priority.
+- 🌐 **Web-Based Management Interface:** Provides a centralized dashboard for Municipality Administrators and Municipal Police Officers to monitor traffic conditions, review ambulance events, and perform manual overrides.
+- ⚙️ **Dual-Node Architecture:** Distributes processing cleanly between a dedicated vision/camera node and a separate traffic-control node.
 
 ---
 
 ## 🏗 System Architecture
 
 ```text
-  ┌─────────────────┐       ┌──────────────────────┐       ┌──────────────────────┐
-  │   Video Feed    │ ───►  │  Edge AI Processing  │ ───►  │ Traffic Logic Engine │
-  │ (CCTV / Camera) │       │ (OpenCV / YOLO Model)│       │  (Density & Queues)  │
-  └─────────────────┘       └──────────────────────┘       └──────────┬───────────┘
-                                                                      │
-                                                                      ▼
-  ┌─────────────────┐       ┌──────────────────────┐       ┌──────────────────────┐
-  │ Physical LEDs / │ ◄───  │ Microcontroller Hub  │ ◄───  │ Control Signal Rules │
-  │  Traffic Light  │       │   (ESP32 / AVR C)    │       │ (Preemption / Delay) │
-  └─────────────────┘       └──────────────────────┘       └──────────────────────┘
+  ┌──────────────────────────────────────────────┐
+  │              Camera & Vision Node            │
+  │               (ESP32-S3 Board)               │
+  │  - Monitors Road A & Road B                  │
+  │  - Performs Vehicle Counting & Detection     │
+  │  - Detects Real-Time Ambulances              │
+  └──────────────────────┬───────────────────────┘
+                         │ Transmits Data / Status
+                         ▼
+  ┌──────────────────────────────────────────────┐
+  │             Traffic-Control Node             │
+  │               (ESP32-S3 Board)               │
+  │  - Manages Traffic Light LEDs                │
+  │  - Executes Routine & Emergency Transitions  │
+  └──────────────────────┬───────────────────────┘
+                         │
+                         ▼
+  ┌──────────────────────────────────────────────┐
+  │             Web Dashboard & DB               │
+  │  - Municipality & Police Admin Interface     │
+  │  - Historical Traffic Logs & Event Tracking  │
+  └──────────────────────────────────────────────┘
